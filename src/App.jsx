@@ -1,58 +1,63 @@
 // App.jsx - the root of the entire app
-// tasks are stored here so every page shares the same data
-// when tasks change on any page, all pages see the update
+// tasks are now fetched from the backend instead of being hardcoded
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Navbar from './components/Navbar'
-
-// importing all pages
 import Home from './pages/Home'
 import List from './pages/List'
 import Details from './pages/Details'
 import AddTask from './pages/AddTask'
 
+// importing api functions from services/api.js
+import { getTasks, addTask, deleteTask, completeTask } from './services/api'
+
 function App() {
 
-  // tasks live here now - one central place for all pages to use
-  // useState stores the list and lets us update it from any page
-  const [tasks, setTasks] = useState([
-    { id: 1, title: 'Finish assignment', due: 'Tomorrow', status: 'Pending', description: 'Complete the React midterm project' },
-    { id: 2, title: 'Buy groceries', due: 'Friday', status: 'Complete', description: 'Milk, bread, eggs and vegetables' },
-    { id: 3, title: 'Study for exam', due: 'Next week', status: 'Pending', description: 'Cover chapters 4 to 7' },
-  ])
+  // tasks state - starts empty, gets filled from the backend
+  const [tasks, setTasks] = useState([])
 
-   // adds a new task to the list - called from AddTask page
-  const addTask = (newTask) => {
-    setTasks([...tasks, { ...newTask, id: tasks.length + 1, status: 'Pending' }])
+  // useEffect runs once when the app loads - fetches all tasks from backend
+  useEffect(() => {
+    fetchTasks()
+  }, [])
+
+  // fetches all tasks from the backend and stores them in state
+  const fetchTasks = async () => {
+    const data = await getTasks()
+    setTasks(data)
   }
 
-
-  // deletes a task by id - called from Details page
-  const deleteTask = (id) => {
-    setTasks(tasks.filter(task => task.id !== id))
+  // adds a new task to the backend then refreshes the task list
+  const handleAddTask = async (newTask) => {
+    await addTask(newTask)
+    fetchTasks()
   }
 
-  // marks a task as complete by id - called from Details page
-  const completeTask = (id) => {
-    setTasks(tasks.map(task =>
-      task.id === id ? { ...task, status: 'Complete' } : task
-    ))
+  // deletes a task from the backend then refreshes the task list
+  const handleDeleteTask = async (id) => {
+    await deleteTask(id)
+    fetchTasks()
+  }
+
+  // marks a task as complete in the backend then refreshes the task list
+  const handleCompleteTask = async (id) => {
+    await completeTask(id)
+    fetchTasks()
   }
 
   return (
     <BrowserRouter>
 
-      {/* Navbar shows on every page - its outside of routes */}
+      {/* Navbar shows on every page */}
       <Navbar />
 
       {/* Routes decides which page to show based on the URL */}
-      {/* each page receives tasks and functions as props */}
       <Routes>
         <Route path="/home" element={<Home tasks={tasks} />} />
         <Route path="/list" element={<List tasks={tasks} />} />
-        <Route path="/details/:id" element={<Details tasks={tasks} deleteTask={deleteTask} completeTask={completeTask} />} />
-        <Route path="/add" element={<AddTask addTask={addTask} />} />
+        <Route path="/details/:id" element={<Details tasks={tasks} deleteTask={handleDeleteTask} completeTask={handleCompleteTask} />} />
+        <Route path="/add" element={<AddTask addTask={handleAddTask} />} />
       </Routes>
 
     </BrowserRouter>

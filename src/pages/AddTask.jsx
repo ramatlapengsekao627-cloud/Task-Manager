@@ -16,6 +16,7 @@ function AddTask({ addTask }) {
     title: '',
     description: '',
     due: '',
+    status: 'Pending'
   })
   const [descriptionRows, setDescriptionRows] = useState(3)
 
@@ -125,9 +126,23 @@ function AddTask({ addTask }) {
               {errors.due && <p style={{ color: 'red', fontSize: '0.85rem' }}>{errors.due}</p>}
             </div>
 
+            {/* status field */}
+            <div className="mb-4">
+              <label className="form-label">Status</label>
+              <select
+                name="status"
+                className="form-select"
+                style={{ backgroundColor: '#0d0d0d', color: 'white', border: '1px solid #333' }}
+                value={formData.status}
+                onChange={handleChange}
+              >
+                <option value="Pending">Pending</option>
+                <option value="Complete">Complete</option>
+              </select>
+            </div>
+
             {/* submit button */}
             <button type="submit" className="btn btn-primary w-100">Add Task</button>
-
           </form>
 
         </div>
