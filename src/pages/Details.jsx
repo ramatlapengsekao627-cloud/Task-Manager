@@ -59,10 +59,13 @@ function Details({ tasks, deleteTask, completeTask }) {
   // sends updated task data to the backend then reloads the page to show new values
   const handleSave = async () => {
     await fetch(`${import.meta.env.VITE_API_URL}/tasks/${task.id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(editData)
-    })
+  method: 'PUT',
+  headers: {
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${localStorage.getItem('token')}`
+  },
+  body: JSON.stringify(editData)
+  })
     // turns off edit mode
     setEditMode(false)
     // reloads the page so the updated task info is fetched from the backend
