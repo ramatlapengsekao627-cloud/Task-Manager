@@ -1,15 +1,16 @@
-// api.js - handles all communication between the React frontend and the backend
-// This file defines functions that make HTTP requests to the backend API to get, add, delete, and update tasks.
-const BASE_URL = 'http://localhost:5000'
+// api.js - handles all communication between frontend and backend
+// BASE_URL points to backend - uses environment variable on live site, localhost for development
 
-// gets all tasks from the backend
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+
+// gets all tasks from backend
 export const getTasks = async () => {
   const response = await fetch(`${BASE_URL}/tasks`)
   const data = await response.json()
   return data
 }
 
-// adds a new task by sending it to the backend
+// adds a new task
 export const addTask = async (task) => {
   const response = await fetch(`${BASE_URL}/tasks`, {
     method: 'POST',
@@ -29,7 +30,7 @@ export const deleteTask = async (id) => {
   return data
 }
 
-// updates a task status to complete
+// marks a task as complete
 export const completeTask = async (id) => {
   const response = await fetch(`${BASE_URL}/tasks/${id}/complete`, {
     method: 'PUT'
